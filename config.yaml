@@ -1,0 +1,41 @@
+# Crypto Signal Engine configuration.
+# Anything not set here falls back to the defaults in cryptosignal/config.py.
+
+# Tried in order - the first exchange reachable from your network is used.
+exchanges: [kucoin, binance, bybit, okx, kraken]
+
+symbols:
+  - BTC/USDT
+  - ETH/USDT
+  - SOL/USDT
+  - BNB/USDT
+  - XRP/USDT
+
+timeframe: 4h          # candles used for signals
+history_candles: 3000  # ~500 days of 4h candles
+trend_timeframe: 1d    # higher timeframe for the bull/bear regime filter
+
+strategy:
+  buy_threshold: 0.35
+  sell_threshold: -0.35
+  require_bull_regime: true  # only BUY when the daily close is above the daily EMA200
+  ml_weight: 0.5             # 0 = rules only, 1 = ML only
+  stop_loss_atr: 2.0
+  take_profit_atr: 4.0
+
+model:
+  enabled: true
+  horizon: 6             # predict the move over the next 6 candles (24h on 4h)
+  label_threshold: 0.005 # "up" means more than +0.5% after the horizon
+
+backtest:
+  initial_capital: 10000
+  fee: 0.001       # 0.1% per side
+  slippage: 0.0005
+
+# Telegram alerts: prefer the TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID env vars.
+alerts:
+  telegram_token: ""
+  telegram_chat_id: ""
+
+watch_interval_minutes: 60
