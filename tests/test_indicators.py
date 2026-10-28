@@ -42,3 +42,11 @@ def test_regime_has_no_lookahead():
     row = out.loc[day]
     assert row["htf_close"] == daily["close"].iloc[99]
     assert set(out["regime"].unique()) <= {-1.0, 0.0, 1.0}
+
+
+def test_regime_handles_mixed_timestamp_units():
+    daily = make_ohlcv(300, freq="1D", seed=1)
+    intraday = make_ohlcv(300 * 6, freq="4h", seed=2)
+    intraday.index = intraday.index.as_unit("ms")
+    out = add_regime(intraday, daily, pd.Timedelta("1D"), ema_len=50)
+    assert out["regime"].iloc[-1] in (-1.0, 1.0)

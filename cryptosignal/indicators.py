@@ -101,15 +101,17 @@ def add_regime(df: pd.DataFrame, htf: pd.DataFrame, htf_period: pd.Timedelta, em
     """
     trend = pd.DataFrame(
         {"htf_close": htf["close"].to_numpy(), "htf_ema": ema(htf["close"], ema_len).to_numpy()},
-        index=htf.index + htf_period,
+        index=(htf.index + htf_period).as_unit("ns"),
     ).dropna()
     out = df.copy()
     if trend.empty:
         out["htf_close"] = np.nan
         out["htf_ema"] = np.nan
     else:
+        left = out[[]].rename_axis("timestamp").reset_index()
+        left["timestamp"] = left["timestamp"].dt.as_unit("ns")
         merged = pd.merge_asof(
-            out[[]].reset_index(), trend.rename_axis("timestamp").reset_index(), on="timestamp", direction="backward"
+            left, trend.rename_axis("timestamp").reset_index(), on="timestamp", direction="backward"
         ).set_index("timestamp")
         out["htf_close"] = merged["htf_close"].to_numpy()
         out["htf_ema"] = merged["htf_ema"].to_numpy()
