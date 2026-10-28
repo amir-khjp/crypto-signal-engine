@@ -56,7 +56,13 @@ DEFAULTS: dict[str, Any] = {
         "label_threshold": 0.005,
         "min_train": 1000,
         "retrain_every": 250,
+        # Live ML weight is scaled from 0 at min_auc to full at full_auc (out-of-sample AUC),
+        # so a model without a demonstrated edge cannot drive signals.
+        "min_auc": 0.52,
+        "full_auc": 0.56,
         "params": {
+            "class_weight": "balanced",
+            "n_jobs": 1,  # small datasets train faster single-threaded
             "n_estimators": 300,
             "learning_rate": 0.03,
             "num_leaves": 15,
